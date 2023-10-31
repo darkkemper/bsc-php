@@ -1,5 +1,5 @@
 {
-    "name": "fenguoz/bsc-php",
+    "name": "darkkemper/bsc-php",
     "description": "Support Binance's BNB and BEP20, which include functions such as address creation, balance query, transaction transfer, query the latest blockchain, query information based on the blockchain, and query information based on the transaction hash",
     "keywords": [
         "php",
@@ -8,7 +8,7 @@
         "bep20"
     ],
     "type": "library",
-    "homepage": "https://github.com/Fenguoz/bsc-php",
+    "homepage": "https://github.com/darkkemper/bsc-php",
     "license": "MIT",
     "authors": [
         {
