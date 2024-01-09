@@ -13,12 +13,14 @@ class BscscanApi implements ProxyApi
         $this->network = $network;
     }
 
-    public function send($method, $params = [])
+    public function send($method, $params = [], $error_reporting = false)
     {
         $defaultParams = [
             'module' => 'proxy',
             'tag' => 'latest',
         ];
+
+        isset($params['params']) ? $params = $params['params'] : null;
 
         foreach ($defaultParams as $key => $val) {
             if (!isset($params[$key])) {
@@ -37,11 +39,26 @@ class BscscanApi implements ProxyApi
             $url .= "&{$strParams}";
         }
 
-        $res = Utils::httpRequest('GET', $url);
-        if (isset($res['result'])) {
-            return $res['result'];
+        if (!$error_reporting) {
+            $response = Utils::httpRequest('GET', $url);
+            if (isset($response['result'])) {
+                return $response['result'];
+            } else {
+                return false;
+            }
         } else {
-            return false;
+            try {
+                $scheme = [
+                    'result' => null,
+                    'error' => null
+                ];
+
+                $response = Utils::httpRequest('GET', $url);
+
+                return Utils::array_merge_recursive_distinct($scheme, $response);
+            } catch (\Exception $e) {
+                return ['error' => $e->getMessage()];
+            }
         }
     }
 
@@ -83,8 +100,7 @@ class BscscanApi implements ProxyApi
 
     function getTransactionReceipt(string $txHash)
     {
-        $res = $this->send('eth_getTransactionReceipt', ['txhash' => $txHash]);
-        return $res;
+        return $this->send('eth_getTransactionReceipt', ['txhash' => $txHash], true);
     }
 
     function getTransactionByHash(string $txHash)
@@ -94,7 +110,7 @@ class BscscanApi implements ProxyApi
 
     function sendRawTransaction($raw)
     {
-        return $this->send('eth_sendRawTransaction', ['hex' => $raw]);
+        return $this->send('eth_sendRawTransaction', ['hex' => $raw], true);
     }
 
     function getNonce(string $address)
